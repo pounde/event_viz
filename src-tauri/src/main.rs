@@ -3,6 +3,8 @@
 
 mod error;
 mod logging;
+mod commands;
+mod data_source;
 
 #[cfg(test)]
 mod tests;
