@@ -1,5 +1,49 @@
 # Tauri 3D Event Debriefing Application - Technical Specification
 
+## Quickstart
+
+### Prerequisites
+
+- [Rust](https://rustup.rs/) 1.89.0 or later
+- [Node.js](https://nodejs.org/) 22 LTS
+- Platform-specific build tools:
+  - **Windows**: Microsoft Visual Studio C++ Build Tools
+  - **macOS**: Xcode Command Line Tools
+  - **Linux**: Build essentials (gcc, cmake)
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd event_viz
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run in development mode**
+   ```bash
+   npm run tauri dev
+   ```
+
+### Build for production
+
+```bash
+npm run tauri build
+```
+
+The built application will be available in `src-tauri/target/release/bundle/`.
+
+### Project Structure
+
+- `src/` - React frontend source code
+- `src-tauri/` - Rust backend source code
+- `public/` - Static assets
+- `dist/` - Built frontend assets (generated)
+
 ## Overview
 
 Build a barebones Tauri-based 3D event debriefing application using a plugin-first architecture where ALL functionality is implemented as plugins, including first-party components. The core system provides only the plugin runtime, UI framework, and file management, with React/Three.js frontend and Rust backend supporting both directory and compressed project formats.
