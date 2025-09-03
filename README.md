@@ -122,6 +122,154 @@ Core system is merely a plugin host - all data import, processing, visualization
 - Performance benchmarks for 3D rendering
 - Cross-platform compatibility validation
 
+## Error Handling and Logging
+
+### Error Handling System
+
+The application implements a comprehensive error handling system that provides consistent error management across both Rust backend and React frontend.
+
+#### Backend Error Types (Rust)
+
+```rust
+use crate::error::AppError;
+
+// Create specific error types
+AppError::validation("Input cannot be empty")
+AppError::network("Connection timeout")
+AppError::io("File not found")
+```
+
+**Available Error Categories:**
+- `Network` - Connection failures, timeouts
+- `Validation` - Input validation errors
+- `FileSystem` - File I/O operations
+- `Database` - Data persistence issues
+- `System` - Internal application errors
+
+#### Frontend Error Handling (React)
+
+```typescript
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+
+function MyComponent() {
+  const { handleError, withErrorHandling } = useErrorHandler();
+  
+  const riskyOperation = async () => {
+    await withErrorHandling(async () => {
+      // Your async operation
+      await someApiCall();
+    });
+  };
+}
+```
+
+**Error Boundary Integration:**
+```tsx
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
+<ErrorBoundary>
+  <YourComponent />
+</ErrorBoundary>
+```
+
+### Logging System
+
+The application provides structured logging with multiple severity levels for both development and production environments.
+
+#### Log Levels
+
+- `DEBUG` - Detailed diagnostic information
+- `INFO` - General operational messages
+- `WARN` - Warning conditions
+- `ERROR` - Error conditions affecting functionality
+- `CRITICAL` - System failures requiring immediate attention
+
+#### Backend Logging (Rust)
+
+```rust
+use tracing::{info, warn, error, debug};
+
+// Simple logging
+info!("Operation completed successfully");
+warn!("Deprecated API usage detected");
+error!("Failed to process request: {}", error_msg);
+
+// Structured logging with context
+info!(
+    user_id = %user.id,
+    action = "export",
+    format = "csv",
+    "User initiated data export"
+);
+```
+
+#### Frontend Logging (React)
+
+```typescript
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+
+function MyComponent() {
+  const { logInfo, logError, logWarn } = useErrorHandler();
+  
+  const handleExport = async () => {
+    logInfo('Starting data export', { format: 'csv' });
+    
+    try {
+      await exportData();
+      logInfo('Export completed successfully');
+    } catch (error) {
+      logError('Export failed', { error: error.message });
+    }
+  };
+}
+```
+
+### IPC Error Handling
+
+Tauri IPC commands implement automatic error handling with retry logic:
+
+```typescript
+import { IPCErrorHandler } from '@/utils/ipcErrorHandler';
+
+const ipcHandler = new IPCErrorHandler();
+
+// Automatic retry with timeout
+const result = await ipcHandler.safeInvoke(
+  'command_name',
+  { param: 'value' },
+  5000,  // 5 second timeout
+  3      // 3 retry attempts
+);
+
+if (result.success) {
+  console.log('Success:', result.data);
+} else {
+  console.error('Failed:', result.error);
+}
+```
+
+### Error Recovery
+
+The system includes automatic error recovery mechanisms:
+
+1. **Retry Logic** - Network errors automatically retry with exponential backoff
+2. **Fallback Handlers** - Graceful degradation when features fail
+3. **Error Boundaries** - Prevent React component crashes from affecting the entire app
+4. **Sanitization** - Sensitive data is automatically removed from error messages
+
+### Development vs Production
+
+**Development Mode:**
+- Full stack traces in error messages
+- Verbose logging to console
+- Error details in UI for debugging
+
+**Production Mode:**
+- User-friendly error messages
+- Error reporting to logging service
+- Minimal console output
+- Sensitive data sanitization
+
 ## Task Summary
 
 **Total Tasks Created**: 10 essential tasks for MVP implementation
